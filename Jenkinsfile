@@ -11,8 +11,8 @@ pipeline {
         stage('Validate Kubernetes Manifests') {
             steps {
                 echo 'Validating Kustomize syntax...'
-                // This simulates a standard syntax smoke test
-                sh 'find . -name "kustomization.yaml" -exec echo "Validating: {}" \;'
+                // A cleaner, standard bash loop that Groovy won't choke on
+                sh 'for file in $(find . -name "kustomization.yaml"); do echo "Validating: $file"; done'
             }
         }
     }
