@@ -7,7 +7,7 @@ resources:
 patches:
   - target:
       kind: Deployment
-      name: nginx-deployment
+      name: test-web-server
     patch: |-
       - op: replace
         path: /spec/replicas
