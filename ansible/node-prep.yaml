@@ -1,0 +1,37 @@
+---
+- name: Prepare Linux Node for Kubernetes & GitOps
+  hosts: k8s_nodes
+  become: yes
+  tasks:
+
+    - name: Update apt package cache
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
+
+    - name: Install baseline system dependencies
+      package:
+        name:
+          - curl
+          - git
+          - htop
+          - apt-transport-https
+          - ca-certificates
+        state: present
+
+    - name: Load required kernel modules for container networking
+      command: "modprobe {{ item }}"
+      loop:
+        - overlay
+        - br_netfilter
+
+    - name: Create sysctl config file for Kubernetes networking
+      copy:
+        dest: /etc/sysctl.d/99-kubernetes.conf
+        content: |
+          net.bridge.bridge-nf-call-iptables = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward = 1
+
+    - name: Apply sysctl settings
+      command: sysctl --system
